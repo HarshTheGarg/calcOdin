@@ -61,15 +61,84 @@ function addToExpression(element) {
 
 function evaluateExp() {
     let expArray = Array.from(expression);
+    // console.log(expArray);
+    let expArrayComp = [];
     let firstNum = '';
     let secNum = '';
+    
     let action = '';
     let actionReached = false;
-    let result = '';
+    
+    let result;
+
+    // const actions = ["+", "-", "*", "/"];
 
     for(let i = 0; i < expArray.length; i++){
+
+        if (!(isNaN(+expArrayComp[expArrayComp.length - 1])) &&
+            !(isNaN(+expArray[i]))) {
+                expArrayComp[expArrayComp.length - 1] += expArray[i];
+        }else{
+            expArrayComp.push(expArray[i]);
+        };
+
+    };
+
+    // division
+    while(expArrayComp.length > 1){
+        let ind = expArrayComp.indexOf('/');
         
-        if (isNaN(+expArray[i])){
+        if (ind == -1){
+            break;
+        };
+
+        result = divide(expArrayComp[ind - 1], expArrayComp[ind + 1]);
+        expArrayComp.splice(ind - 1, 3, result);
+    };
+
+    // multiply
+    while(expArrayComp.length > 1){
+        let ind = expArrayComp.indexOf('*');
+        
+        if (ind == -1){
+            break;
+        };
+        
+        result = multiply(expArrayComp[ind - 1], expArrayComp[ind + 1]);
+        expArrayComp.splice(ind - 1, 3, result);
+    };
+
+    // subtract
+    while(expArrayComp.length > 1){
+        let ind = expArrayComp.indexOf('-');
+        
+        if (ind == -1){
+            break;
+        };
+
+        result = subtract(expArrayComp[ind - 1], expArrayComp[ind + 1]);
+        expArrayComp.splice(ind - 1, 3, result);
+        // console.log({result});
+    };
+
+    
+    // addition
+    while(expArrayComp.length > 1){
+        let ind = expArrayComp.indexOf('+');
+        
+        if (ind == -1){
+            break;
+        };
+
+        result = add(expArrayComp[ind - 1], expArrayComp[ind + 1]);
+        expArrayComp.splice(ind - 1, 3, result);
+    };
+    console.log({result});
+    
+
+    /* for(let i = 0; i < expArray.length; i++){
+        
+        if (actions.includes(expArray[i])){
             action = expArray[i];
             actionReached = true;
         }else if(actionReached == false){
@@ -78,9 +147,9 @@ function evaluateExp() {
             secNum += expArray[i];
         };
 
-    };
+    }; */
 
-    if(action == '' || firstNum == '' || secNum == ''){
+    /* if(action == '' || firstNum == '' || secNum == ''){
         result = 'Error';
     }else if(action == '+'){
         result = add(firstNum, secNum);
@@ -93,6 +162,7 @@ function evaluateExp() {
     };
 
     displayResult(result);
+    expression = result; */
 };
 
 function add(a, b) {
@@ -107,7 +177,7 @@ function divide(a, b) {
     if(b==0){
         return 'Error';
     }
-    return +a/+b;
+    return Math.round((+a/+b) * 100)/100;
 };
 
 function subtract(a, b) {
