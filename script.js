@@ -44,6 +44,9 @@ function addOnDisplay() {
         (expression[expression.length - 1].includes('.') ||
         isNaN(expression[expression.length - 1]))){
                 // nothing
+    }else if(display.textContent == "Error"){
+        clearScreen();  
+        display.textContent += this.textContent.trim();
     }else{
         display.textContent += this.textContent.trim();
     };
@@ -84,109 +87,74 @@ function addToExpression(element) {
     }else{
         expression.push(eleCont);
     };
-
-    // let expArray = Array.from(expression);
-    /* let expArrayComp = [];
-    let result;
-
-    for(let i = 0; i < expression.length; i++){
-
-        if (!(isNaN(+expArrayComp[expArrayComp.length - 1])) &&
-            !(isNaN(+expression[i]))) {
-                expArrayComp[expArrayComp.length - 1] += expression[i];
-        }else{
-            expArrayComp.push(expression[i]);
-        };
-
-    }; */
-
-
 };
 
 
 function evaluateExp() {
-    // let expArray = Array.from(expression);
-    // let expArrayComp = [];
-    
-    /* let firstNum = '';
-    let secNum = '';
-    
-    let action = '';
-    let actionReached = false; */
-    
-    // let result;
+    if (isNaN(+expression[expression.length - 1])){
+        result = "Error";
 
-    // const actions = ["+", "-", "*", "/"];
+    }else{
 
-    /* for(let i = 0; i < expArray.length; i++){
-
-        if (!(isNaN(+expArrayComp[expArrayComp.length - 1])) &&
-            !(isNaN(+expArray[i]))) {
-                expArrayComp[expArrayComp.length - 1] += expArray[i];
-        }else{
-            expArrayComp.push(expArray[i]);
+        // division
+        while(expression.length > 1){
+            let ind = expression.indexOf('/');
+            
+            if (ind == -1){
+                break;
+            };
+    
+            result = divide(expression[ind - 1], expression[ind + 1]);
+            expression.splice(ind - 1, 3, result);
         };
-
-    }; */
-
-    // division
-    while(expression.length > 1){
-        let ind = expression.indexOf('/');
+    
+        // multiply
+        while(expression.length > 1){
+            let ind = expression.indexOf('*');
+            
+            if (ind == -1){
+                break;
+            };
+            
+            result = multiply(expression[ind - 1], expression[ind + 1]);
+            expression.splice(ind - 1, 3, result);
+        };
+    
+        // subtract
+        while(expression.length > 1){
+            let ind = expression.indexOf('-');
+            
+            if (ind == -1){
+                break;
+            };
+    
+            result = subtract(expression[ind - 1], expression[ind + 1]);
+            expression.splice(ind - 1, 3, result);
+            
+        };
+    
         
-        if (ind == -1){
-            break;
-        };
-
-        result = divide(expression[ind - 1], expression[ind + 1]);
-        expression.splice(ind - 1, 3, result);
+        // addition
+        while(expression.length > 1){
+            let ind = expression.indexOf('+');
+            
+            if (ind == -1){
+                break;
+            };
+            result = add(expression[ind - 1], expression[ind + 1]);
+            expression.splice(ind - 1, 3, result);
+        }
     };
 
-    // multiply
-    while(expression.length > 1){
-        let ind = expression.indexOf('*');
-        
-        if (ind == -1){
-            break;
-        };
-        
-        result = multiply(expression[ind - 1], expression[ind + 1]);
-        expression.splice(ind - 1, 3, result);
-    };
-
-    // subtract
-    while(expression.length > 1){
-        let ind = expression.indexOf('-');
-        
-        if (ind == -1){
-            break;
-        };
-
-        result = subtract(expression[ind - 1], expression[ind + 1]);
-        expression.splice(ind - 1, 3, result);
-        // console.log({result});
-    };
-
-    
-    // addition
-    while(expression.length > 1){
-        let ind = expression.indexOf('+');
-        
-        if (ind == -1){
-            break;
-        };
-
-        result = add(expression[ind - 1], expression[ind + 1]);
-        expression.splice(ind - 1, 3, result);
-    };
     displayResult(result);
 };
 
 function add(a, b) {
-    return +a + +b;
+    return Math.round((+a + +b)*100)/100;
 };
 
 function multiply(a, b){
-    return +a * +b;
+    return Math.round((+a * +b) * 100)/100;
 };
 
 function divide(a, b) {
@@ -197,12 +165,14 @@ function divide(a, b) {
 };
 
 function subtract(a, b) {
-    return +a - +b;
+    return Math.round((+a - +b) * 100)/100;
 };
 
 function displayResult(res) {
     clearScreen();
     display.textContent = res;
     expression = [];
-    expression.push(res);
+    if(res != "Error"){
+        expression.push(res);
+    };
 };
