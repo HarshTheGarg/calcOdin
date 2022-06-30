@@ -13,11 +13,11 @@ const percentButton = document.querySelector(".percent");
 
 const numbers = [...document.querySelectorAll(".number")]
 
-const display = document.querySelector(".display");
+const display = document.querySelector(".display span");
 
-let expression = '';
+let expression = [];
 
-let mainButtons = [addButton, subtractButton, multiplyButton, divideButton];
+let mainButtons = [addButton, subtractButton, multiplyButton, divideButton, decimalButton];
 
 
 
@@ -27,7 +27,7 @@ for(let i = 0; i < mainButtons.length; i++){
 
 clearButton.addEventListener('click', () => {
     clearScreen();
-    expression = '';
+    expression = [];
 });
 
 equalButton.addEventListener('click', evaluateExp);
@@ -40,7 +40,14 @@ for(let i = 0; i < numbers.length; i++){
 
 
 function addOnDisplay() {
-    display.textContent += this.textContent.trim();
+    if(this.textContent.trim() == "." && 
+        (expression[expression.length - 1].includes('.') ||
+        isNaN(expression[expression.length - 1]))){
+                // nothing
+    }else{
+        display.textContent += this.textContent.trim();
+    };
+
     addToExpression(this);
 };
 
@@ -49,31 +56,69 @@ function clearScreen() {
 };
 
 function addToExpression(element) {
+
+    let eleCont = element.textContent.trim();
+
     if([...element.classList].includes('multiply')){
-        expression += '*';
+        
+        expression.push('*');
+
     }else if([...element.classList].includes('divide')){
-        expression += '/';
+        
+        expression.push('/');
+    
+    }else if(!(isNaN(+eleCont)) &&
+            !isNaN(expression[expression.length - 1])){
+        
+        expression[expression.length - 1] += eleCont;
+    
+    }else if(eleCont == '.'){
+        
+        if(expression[expression.length - 1].includes('.') ||
+            isNaN(expression[expression.length - 1])){
+            // nothing
+        }else{
+            expression[expression.length - 1] += ".";
+        };
+
     }else{
-        expression += element.textContent.trim();
+        expression.push(eleCont);
     };
+
+    // let expArray = Array.from(expression);
+    /* let expArrayComp = [];
+    let result;
+
+    for(let i = 0; i < expression.length; i++){
+
+        if (!(isNaN(+expArrayComp[expArrayComp.length - 1])) &&
+            !(isNaN(+expression[i]))) {
+                expArrayComp[expArrayComp.length - 1] += expression[i];
+        }else{
+            expArrayComp.push(expression[i]);
+        };
+
+    }; */
+
+
 };
 
 
 function evaluateExp() {
-    let expArray = Array.from(expression);
-    // console.log(expArray);
-    let expArrayComp = [];
-    let firstNum = '';
+    // let expArray = Array.from(expression);
+    // let expArrayComp = [];
+    
+    /* let firstNum = '';
     let secNum = '';
     
     let action = '';
-    let actionReached = false;
+    let actionReached = false; */
     
-    let result;
+    // let result;
 
     // const actions = ["+", "-", "*", "/"];
 
-    for(let i = 0; i < expArray.length; i++){
+    /* for(let i = 0; i < expArray.length; i++){
 
         if (!(isNaN(+expArrayComp[expArrayComp.length - 1])) &&
             !(isNaN(+expArray[i]))) {
@@ -82,87 +127,58 @@ function evaluateExp() {
             expArrayComp.push(expArray[i]);
         };
 
-    };
+    }; */
 
     // division
-    while(expArrayComp.length > 1){
-        let ind = expArrayComp.indexOf('/');
+    while(expression.length > 1){
+        let ind = expression.indexOf('/');
         
         if (ind == -1){
             break;
         };
 
-        result = divide(expArrayComp[ind - 1], expArrayComp[ind + 1]);
-        expArrayComp.splice(ind - 1, 3, result);
+        result = divide(expression[ind - 1], expression[ind + 1]);
+        expression.splice(ind - 1, 3, result);
     };
 
     // multiply
-    while(expArrayComp.length > 1){
-        let ind = expArrayComp.indexOf('*');
+    while(expression.length > 1){
+        let ind = expression.indexOf('*');
         
         if (ind == -1){
             break;
         };
         
-        result = multiply(expArrayComp[ind - 1], expArrayComp[ind + 1]);
-        expArrayComp.splice(ind - 1, 3, result);
+        result = multiply(expression[ind - 1], expression[ind + 1]);
+        expression.splice(ind - 1, 3, result);
     };
 
     // subtract
-    while(expArrayComp.length > 1){
-        let ind = expArrayComp.indexOf('-');
+    while(expression.length > 1){
+        let ind = expression.indexOf('-');
         
         if (ind == -1){
             break;
         };
 
-        result = subtract(expArrayComp[ind - 1], expArrayComp[ind + 1]);
-        expArrayComp.splice(ind - 1, 3, result);
+        result = subtract(expression[ind - 1], expression[ind + 1]);
+        expression.splice(ind - 1, 3, result);
         // console.log({result});
     };
 
     
     // addition
-    while(expArrayComp.length > 1){
-        let ind = expArrayComp.indexOf('+');
+    while(expression.length > 1){
+        let ind = expression.indexOf('+');
         
         if (ind == -1){
             break;
         };
 
-        result = add(expArrayComp[ind - 1], expArrayComp[ind + 1]);
-        expArrayComp.splice(ind - 1, 3, result);
+        result = add(expression[ind - 1], expression[ind + 1]);
+        expression.splice(ind - 1, 3, result);
     };
-    console.log({result});
-    
-
-    /* for(let i = 0; i < expArray.length; i++){
-        
-        if (actions.includes(expArray[i])){
-            action = expArray[i];
-            actionReached = true;
-        }else if(actionReached == false){
-            firstNum += expArray[i];
-        }else{
-            secNum += expArray[i];
-        };
-
-    }; */
-
-    /* if(action == '' || firstNum == '' || secNum == ''){
-        result = 'Error';
-    }else if(action == '+'){
-        result = add(firstNum, secNum);
-    }else if(action == '-'){
-        result = subtract(firstNum, secNum);
-    }else if(action == '*'){
-        result = multiply(firstNum, secNum);
-    }else if(action == '/'){
-        result = divide(firstNum, secNum);
-    };
-
     displayResult(result);
-    expression = result; */
 };
 
 function add(a, b) {
@@ -187,4 +203,6 @@ function subtract(a, b) {
 function displayResult(res) {
     clearScreen();
     display.textContent = res;
+    expression = [];
+    expression.push(res);
 };
